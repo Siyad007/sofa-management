@@ -140,11 +140,11 @@ export default function Home() {
         
         <header className="mb-16 pt-12 flex items-center justify-between">
           <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
-            <div className="flex items-center gap-3 mb-4 text-blue-500 font-black uppercase tracking-[0.5em] text-[10px]">
-              <div className="w-8 h-[1px] bg-blue-500/50" /> Daxo OS Alpha
+            <div className="flex items-center gap-3 mb-4 text-blue-500 font-black uppercase tracking-[0.5em] text-[10px] md:text-xs">
+              <div className="w-8 h-[1px] bg-blue-500/50" /> Daxo OS Alpha v2.0
             </div>
-            <h1 className="text-6xl font-black tracking-tighter leading-none mb-2 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/40">DAXO</h1>
-            <p className="text-[11px] font-black text-blue-400/60 uppercase tracking-[0.4em] ml-1">Sofa Engineering Hub</p>
+            <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-none mb-2 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/40">DAXO</h1>
+            <p className="text-[11px] md:text-[13px] font-black text-blue-400/60 uppercase tracking-[0.4em] ml-1">Sofa Engineering Hub</p>
           </motion.div>
           
           <motion.div 
@@ -180,19 +180,20 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            className="md:col-span-2 card-heavy p-8 md:p-14 relative overflow-hidden group border-l-[12px] md:border-l-[20px] border-emerald-500 shadow-[0_30px_100px_rgba(0,0,0,0.4)]"
+            whileHover={{ scale: 1.01 }}
+            className="md:col-span-2 card-heavy p-8 md:p-14 relative overflow-hidden group border-l-[12px] md:border-l-[20px] border-emerald-500 shadow-[0_30px_100px_rgba(0,0,0,0.4)] transition-all duration-500"
           >
-            <div className="absolute top-0 right-0 w-full h-full bg-emerald-500/5 blur-[140px] rounded-full -mr-32 -mt-32" />
+            <div className="absolute top-0 right-0 w-full h-full bg-emerald-500/5 blur-[140px] rounded-full -mr-32 -mt-32 group-hover:bg-emerald-500/10 transition-all duration-700" />
             
             <div className="relative z-10">
               <div className="flex items-center gap-3 mb-6 md:mb-8">
-                <div className="w-1.5 h-8 md:h-10 bg-emerald-500 rounded-full" />
+                <div className="w-1.5 h-8 md:h-10 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
                 <p className="text-[10px] md:text-xs font-black text-white/30 uppercase tracking-[0.3em]">Fiscal Cycle Revenue</p>
               </div>
               
               <div className="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-6">
                 <h2 className="text-6xl md:text-[120px] font-black tracking-tighter text-emerald-400 drop-shadow-[0_0_50px_rgba(52,211,153,0.4)] leading-none">₹{stats.weekSalary.toFixed(0)}</h2>
-                <div className="hidden md:block p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+                <div className="hidden md:block p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 group-hover:scale-110 transition-transform">
                   <TrendingUpIcon className="w-8 h-8 text-emerald-500" />
                 </div>
               </div>
@@ -200,9 +201,10 @@ export default function Home() {
               <div className="mt-8 md:mt-16">
                 <button 
                   onClick={() => { setShowSummary(true); haptic.medium(); }}
-                  className="btn-apple-primary w-full md:w-auto flex items-center justify-center gap-4 !from-blue-600 !to-blue-800 shadow-[0_20px_60px_rgba(10,132,255,0.4)] h-20 md:h-24 !rounded-[32px] md:!rounded-[40px] group/btn overflow-hidden relative"
+                  className="btn-apple-primary w-full md:w-auto flex items-center justify-center gap-4 !from-blue-600 !to-blue-800 shadow-[0_20px_60px_rgba(10,132,255,0.4)] h-20 md:h-24 !rounded-[32px] md:!rounded-[40px] group/btn overflow-hidden relative active:scale-95 transition-all"
                 >
-                  <ClipboardCheck className="w-6 h-6 md:w-8 md:h-8" />
+                  <div className="absolute inset-0 bg-white/5 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+                  <ClipboardCheck className="w-6 h-6 md:w-8 md:h-8 group-hover/btn:rotate-12 transition-transform" />
                   <span className="text-[11px] md:text-sm font-black tracking-[0.2em] uppercase">Compute Summary</span>
                 </button>
               </div>
