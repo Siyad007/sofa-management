@@ -33,12 +33,15 @@
   /* Heavy Apple Design Language */
   
   .glass-heavy {
-    @apply bg-black/80 backdrop-blur-[40px] saturate-[180%] border border-white/10;
+    @apply bg-black/80 backdrop-blur-[20px] saturate-[180%] border border-white/10;
+    transform: translateZ(0);
+    will-change: backdrop-filter;
   }
 
   .card-heavy {
-    @apply bg-[#1c1c1e]/90 backdrop-blur-[30px] rounded-[24px] border border-white/15 shadow-2xl;
+    @apply bg-[#1c1c1e]/90 backdrop-blur-[15px] rounded-[24px] border border-white/15 shadow-2xl;
     box-shadow: 0 15px 50px -12px rgba(0, 0, 0, 0.8);
+    transform: translateZ(0);
   }
 
   .btn-apple-primary {

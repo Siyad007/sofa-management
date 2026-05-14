@@ -67,8 +67,8 @@ export default function SplashScreen() {
             <motion.div
               initial={{ scale: 0.6, opacity: 0 }}
               animate={{ scale: 0.8, opacity: 1 }}
-              transition={{ duration: 1.5, ease: "easeOut" }}
-              className="relative w-64 h-48 mb-10 flex items-center justify-center"
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="relative w-64 h-48 mb-10 flex items-center justify-center transform-gpu"
             >
               <svg viewBox="0 0 200 150" className="w-full h-full drop-shadow-[0_0_40px_rgba(59,130,246,0.4)]">
                 {/* Armrests */}
