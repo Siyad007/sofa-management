@@ -1,0 +1,16 @@
+{
+  "name": "Daxo Sofa Management",
+  "short_name": "DaxoLog",
+  "description": "Premium Work Management for Daxo Sofa",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#0A84FF",
+  "icons": [
+    {
+      "src": "/photo_2025-02-02_10-20-26.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}

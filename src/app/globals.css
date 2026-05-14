@@ -1,26 +1,98 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --bg-color: 0, 0, 0;
+    --card-bg: 28, 28, 30;
+    --accent-blue: 10, 132, 255;
+    --accent-green: 50, 215, 75;
+    --accent-red: 255, 69, 58;
+  }
+
+  * {
+    @apply border-white/5;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    @apply antialiased;
+    font-size: 16px;
+    background-color: rgb(var(--bg-color));
+  }
+
+  body {
+    @apply min-h-screen text-white overflow-x-hidden;
+    background-color: rgb(var(--bg-color));
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* Heavy Apple Design Language */
+  
+  .glass-heavy {
+    @apply bg-black/80 backdrop-blur-[40px] saturate-[180%] border border-white/10;
+  }
+
+  .card-heavy {
+    @apply bg-[#1c1c1e]/90 backdrop-blur-[30px] rounded-[24px] border border-white/15 shadow-2xl;
+    box-shadow: 0 15px 50px -12px rgba(0, 0, 0, 0.8);
+  }
+
+  .btn-apple-primary {
+    @apply bg-gradient-to-b from-[#0A84FF] to-[#0070DD] rounded-[16px] py-4 px-6 font-bold text-lg 
+           shadow-lg shadow-blue-500/20 active:scale-95 transition-all duration-200 border-t border-white/20;
+  }
+
+  .input-heavy {
+    @apply bg-[#2c2c2e]/60 border-2 border-white/5 rounded-[16px] p-4 text-lg focus:outline-none 
+           focus:border-[#0A84FF] focus:bg-[#2c2c2e]/80 transition-all;
+  }
+
+  .badge-heavy {
+    @apply bg-gradient-to-br from-[#FF453A] to-[#FF2D55] rounded-full px-2 py-0.5 text-[11px] font-black shadow-md;
+  }
+
+  /* Layout Helpers */
+  .safe-top {
+    padding-top: max(1.5rem, env(safe-area-inset-top));
+  }
+  
+  .safe-bottom {
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  }
+
+  .app-container {
+    @apply max-w-4xl mx-auto px-6 w-full;
+  }
+}
+
+/* Custom Animations */
+@keyframes glow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+.bg-aurora {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 60vh;
+  background: radial-gradient(circle at 50% -20%, rgba(10, 132, 255, 0.15) 0%, transparent 80%);
+  pointer-events: none;
+  z-index: -1;
+  animation: glow 8s ease-in-out infinite;
+}
+
+/* Typography Overrides */
+.text-headline {
+  @apply text-4xl font-extrabold tracking-[-0.03em] leading-tight;
+}
+
+.text-title-heavy {
+  @apply text-2xl font-bold tracking-tight;
 }
