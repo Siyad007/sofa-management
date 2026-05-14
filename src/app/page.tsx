@@ -274,43 +274,51 @@ export default function Home() {
                 className="fixed inset-0 bg-black/98 backdrop-blur-3xl z-[2000]" 
               />
               <motion.div 
-                initial={{ scale: 0.8, opacity: 0, y: 50, rotateX: 20 }}
-                animate={{ scale: 1, opacity: 1, y: 0, rotateX: 0 }}
-                exit={{ scale: 0.8, opacity: 0, y: 50, rotateX: 20 }}
-                transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[92%] max-w-xl glass-heavy rounded-[64px] p-16 z-[2010] border-t-2 border-white/10 shadow-[0_50px_150px_rgba(0,0,0,1)]"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                className="fixed inset-0 z-[9999] bg-black flex flex-col p-6 overflow-hidden md:max-w-xl md:h-[85vh] md:m-auto md:rounded-[48px] md:border-2 md:border-white/10"
               >
-                <div className="flex items-center justify-between mb-12">
-                  <div>
-                    <h3 className="text-6xl font-black tracking-tighter leading-none mb-2">SUMMARY</h3>
-                    <p className="text-[10px] font-black text-blue-400 uppercase tracking-[0.4em]">Audit Sequence Completed</p>
+                {/* Header Section */}
+                <div className="flex items-center justify-between mb-8 flex-shrink-0">
+                  <div className="flex flex-col">
+                    <h3 className="text-4xl md:text-5xl font-black tracking-tighter leading-none uppercase text-white">Summary</h3>
+                    <p className="text-[10px] font-black text-blue-400 uppercase tracking-[0.4em] mt-1">Daxo OS Audit</p>
                   </div>
-                  <button onClick={() => setShowSummary(false)} className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center border border-white/10 active:scale-90 transition-all">
-                    <X className="w-8 h-8 text-white/40" />
+                  <button 
+                    onClick={() => setShowSummary(false)} 
+                    className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center border border-white/10"
+                  >
+                    <X className="w-6 h-6 text-white/40" />
                   </button>
                 </div>
 
-                <div className="bg-white/5 rounded-[40px] p-10 mb-12 border border-white/5 relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl rounded-full" />
-                  <p className="text-[11px] font-black text-white/20 uppercase tracking-[0.5em] mb-8 flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    Encrypted Payload Preview
-                  </p>
-                  <div className="text-lg font-black text-emerald-400/90 space-y-4 whitespace-pre-wrap tracking-tight leading-relaxed">
+                {/* Content Section */}
+                <div className="flex-1 bg-white/[0.03] rounded-[32px] p-6 mb-8 border border-white/5 relative overflow-hidden flex flex-col">
+                  <div className="flex items-center gap-3 mb-6 flex-shrink-0">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]" />
+                    <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">Work Stream Preview</p>
+                  </div>
+                  
+                  <div className="flex-1 text-base md:text-xl font-black text-emerald-400/90 whitespace-pre-wrap tracking-tight leading-relaxed overflow-y-auto scrollbar-none">
                     {`📋 *DAILY WORK REPORT*\n📅 Date: ${new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}\n\n`}
                     {todayItems.map(item => `${item.quantity} ${item.work_type_name.toLowerCase()} ${item.operations.map(o => o.toLowerCase()).join(' ')}`).join('\n')}
-                    {todayItems.length === 0 && "System standby: No data packets logged."}
+                    {todayItems.length === 0 && "No data packets logged."}
                   </div>
                 </div>
 
-                <button 
-                  onClick={copyWhatsAppSummary}
-                  className="btn-apple-primary w-full h-32 !rounded-[44px] flex items-center justify-center gap-6 !from-emerald-600 !to-emerald-800 shadow-[0_30px_80px_rgba(16,185,129,0.4)] group/copy overflow-hidden relative"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/copy:translate-x-full transition-transform duration-1000" />
-                  <MessageCircle className="w-12 h-12 group-hover/copy:scale-110 transition-transform" />
-                  <span className="text-2xl font-black uppercase tracking-[0.2em]">Transmit Payload</span>
-                </button>
+                {/* Footer Section */}
+                <div className="flex flex-col gap-4 flex-shrink-0 pb-safe">
+                  <button 
+                    onClick={copyWhatsAppSummary}
+                    className="btn-apple-primary w-full h-20 !rounded-[28px] flex items-center justify-center gap-4 !from-emerald-600 !to-emerald-800 shadow-xl"
+                  >
+                    <MessageCircle className="w-8 h-8" />
+                    <span className="text-xl font-black uppercase tracking-[0.1em]">Transmit Audit</span>
+                  </button>
+                  <p className="text-center text-[8px] font-bold text-white/20 uppercase tracking-[0.4em]">Secure Transmission Sequence</p>
+                </div>
               </motion.div>
             </>
           )}

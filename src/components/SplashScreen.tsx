@@ -63,12 +63,12 @@ export default function SplashScreen() {
           />
 
           <div className="relative flex flex-col items-center">
-            {/* SVG Sofa Cinematic Drawing - Enhanced */}
+            {/* SVG Sofa Cinematic Drawing - Enhanced & Scaled for Mobile */}
             <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
+              initial={{ scale: 0.6, opacity: 0 }}
+              animate={{ scale: 0.8, opacity: 1 }}
               transition={{ duration: 1.5, ease: "easeOut" }}
-              className="relative w-80 h-64 mb-16 flex items-center justify-center"
+              className="relative w-64 h-48 mb-10 flex items-center justify-center"
             >
               <svg viewBox="0 0 200 150" className="w-full h-full drop-shadow-[0_0_40px_rgba(59,130,246,0.4)]">
                 {/* Armrests */}
@@ -135,7 +135,7 @@ export default function SplashScreen() {
                 initial={{ letterSpacing: '1.2em', opacity: 0, y: 30 }}
                 animate={{ letterSpacing: '0.6em', opacity: 1, y: 0 }}
                 transition={{ duration: 2, ease: [0.22, 1, 0.36, 1] }}
-                className="text-8xl font-black text-white mb-6 text-center pl-[0.6em] relative z-10"
+                className="text-6xl md:text-8xl font-black text-white mb-6 text-center pl-[0.6em] relative z-10"
               >
                 DAXO
               </motion.h1>
