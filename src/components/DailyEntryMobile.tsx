@@ -145,7 +145,10 @@ export default function DailyEntryMobile() {
         .select()
         .single();
 
-      if (entryErr) throw entryErr;
+      if (entryErr) {
+        console.error('Entry Error:', entryErr);
+        throw new Error(`Entry failure: ${entryErr.message}`);
+      }
 
       await supabase.from('daily_entry_items').delete().eq('entry_id', entry.id);
 
@@ -161,9 +164,12 @@ export default function DailyEntryMobile() {
             .select()
             .single();
 
-          if (itemErr) throw itemErr;
+          if (itemErr) {
+            console.error('Batch Item Error:', itemErr);
+            throw new Error(`Batch failure: ${itemErr.message}`);
+          }
 
-          if (newItem) {
+          if (newItem && item.operation_ids.length > 0) {
             const opsToInsert = item.operation_ids.map(opId => ({
               item_id: newItem.id,
               operation_id: opId
@@ -174,13 +180,14 @@ export default function DailyEntryMobile() {
         }
       }
 
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 2000);
-      loadDailyData();
-    } catch (err) {
-      console.error(err);
-      setError('System failure while saving data');
       haptic.heavy();
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+      loadDailyData();
+    } catch (err: any) {
+      console.error('Full Save Error:', err);
+      setError(err.message || 'System logic failure during commit');
+      haptic.medium();
     } finally {
       setSaving(false);
     }
