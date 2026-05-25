@@ -41,10 +41,48 @@ export default function Home() {
   const [todayItems, setTodayItems] = useState<TodayWorkItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showSummary, setShowSummary] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isInstallable, setIsInstallable] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
+
+    // PWA & iOS detection
+    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone;
+    
+    if (isIOSDevice && !isStandalone) {
+      setIsIOS(true);
+    }
+
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setIsInstallable(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    window.addEventListener('appinstalled', () => {
+      setIsInstallable(false);
+      setDeferredPrompt(null);
+    });
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
   }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    haptic.medium();
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`User response to install prompt: ${outcome}`);
+    setDeferredPrompt(null);
+    setIsInstallable(false);
+  };
 
   const loadDashboardData = async () => {
     try {
@@ -156,6 +194,58 @@ export default function Home() {
             </div>
           </motion.div>
         </header>
+
+        {/* PWA Premium Installation Banner */}
+        <AnimatePresence>
+          {isInstallable && (
+            <motion.div
+              initial={{ opacity: 0, y: -25 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -25 }}
+              className="mb-10 p-6 rounded-[32px] glass-heavy border border-blue-500/30 relative overflow-hidden group shadow-[0_20px_40px_rgba(59,130,246,0.15)] flex flex-col md:flex-row md:items-center justify-between gap-6"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-[50px] rounded-full" />
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center border border-blue-500/30 text-blue-400">
+                  <Sparkles className="w-7 h-7 animate-pulse" />
+                </div>
+                <div>
+                  <h4 className="text-lg font-black uppercase tracking-wider text-white">Daxo OS Standalone App</h4>
+                  <p className="text-xs text-white/50 font-bold uppercase tracking-wider mt-0.5">Install on home screen for 1-tap fast access</p>
+                </div>
+              </div>
+              <button
+                onClick={handleInstallClick}
+                className="btn-apple-primary md:w-auto h-14 px-8 !rounded-[20px] flex items-center justify-center gap-2 !from-blue-600 !to-blue-800 text-sm font-black uppercase tracking-[0.15em] active:scale-95 transition-all"
+              >
+                <Zap className="w-4 h-4" /> Install Now
+              </button>
+            </motion.div>
+          )}
+
+          {isIOS && (
+            <motion.div
+              initial={{ opacity: 0, y: -25 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -25 }}
+              className="mb-10 p-6 rounded-[32px] glass-heavy border border-blue-500/20 relative overflow-hidden group shadow-[0_20px_40px_rgba(59,130,246,0.1)]"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-[50px] rounded-full" />
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20 text-blue-400 flex-shrink-0">
+                  <Sparkles className="w-7 h-7" />
+                </div>
+                <div>
+                  <h4 className="text-lg font-black uppercase tracking-wider text-white">Install Daxo OS on iPhone</h4>
+                  <p className="text-xs text-white/50 font-bold uppercase tracking-wider mt-1 leading-relaxed">
+                    1. Tap the <span className="text-blue-400 font-extrabold">Share</span> button at the bottom of Safari.<br />
+                    2. Select <span className="text-blue-400 font-extrabold">"Add to Home Screen"</span>.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {stats.isLeaveToday && (
           <motion.div 
