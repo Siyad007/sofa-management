@@ -10,8 +10,20 @@
   "scope": "/",
   "icons": [
     {
-      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIGZpbGw9ImJsYWNrIi8+CiAgPHBhdGggZD0iTTEwMCAzMDAgTDQxMiAzMDAgTDQxMiAzNTAgQzQxMiAzNjAsIDQwMiAzNzAsIDM5MiAzNzAgTDEyMCAzNzAgQzExMCAzNzAsIDEwMCAzNjAsIDEwMCAzNTAgWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMEE4NEZGIiBzdHJva2Utd2lkdGg9IjIwIi8+CiAgPHBhdGggZD0iTTEzMCAzMDAgTDEzMCAyMDAgQzEzMCAxODAsIDE1MCAxNjAsIDE3MCAxNjAgTDM0MiAxNjAgQzM2MiAxNjAsIDM4MiAxODAsIDM4MiAyMDAgTDM4MiAzMDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzBBODRGRiIgc3Ryb2tlLXdpZHRoPSIyMCIvPgogIDxwYXRoIGQ9Ik04MCAzMDAgTDgwIDI1MCBDODAgMjQwLCA5MCAyMzAsIDEwMCAyMzAgTDEzMCAyMzAgTDEzMCAzMDAgTTM4MiAzMDAgTDM4MiAyMzAgTDQxMiAyMzAgQzQyMiAyMzAsIDQzMiAyNDAsIDQzMiAyNTAgTDQzMiAzMDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzBBODRGRiIgc3Ryb2tlLXdpZHRoPSIyMCIvPgo8L3N2Zz4=",
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
       "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }

@@ -12,7 +12,6 @@ export default function Navigation() {
   const navItems = [
     { href: '/', icon: Home, label: 'Home' },
     { href: '/daily-entry', icon: ClipboardList, label: 'Work' },
-    { href: '/expenses', icon: Wallet, label: 'Exp' },
     { href: '/reports', icon: BarChart3, label: 'Report' },
   ];
 

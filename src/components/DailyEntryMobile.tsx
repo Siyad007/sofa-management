@@ -67,6 +67,7 @@ export default function DailyEntryMobile() {
   const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [pricing, setPricing] = useState<Pricing[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [hasSavedLog, setHasSavedLog] = useState(false);
 
   useEffect(() => {
     loadBaseData();
@@ -104,6 +105,7 @@ export default function DailyEntryMobile() {
       if (fetchErr && fetchErr.code !== 'PGRST116') throw fetchErr;
 
       if (entry) {
+        setHasSavedLog(true);
         setIsLeave(entry.is_leave);
         const loadedItems = (entry.daily_entry_items || []).map((item: any) => ({
           id: item.id,
@@ -113,6 +115,7 @@ export default function DailyEntryMobile() {
         }));
         setItems(loadedItems);
       } else {
+        setHasSavedLog(false);
         setIsLeave(false);
         setItems([]);
       }
@@ -139,6 +142,26 @@ export default function DailyEntryMobile() {
     setError(null);
 
     try {
+      // If there are no items logged and it's not a rest day, delete the entry entirely
+      if (items.length === 0 && !isLeave) {
+        const { error: delErr } = await supabase
+          .from('daily_entries')
+          .delete()
+          .eq('date', date);
+
+        if (delErr) {
+          console.error('Delete Empty Log Error:', delErr);
+          throw new Error(`Deletion failure: ${delErr.message}`);
+        }
+
+        setHasSavedLog(false);
+        haptic.heavy();
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 2000);
+        loadDailyData();
+        return;
+      }
+
       const { data: entry, error: entryErr } = await supabase
         .from('daily_entries')
         .upsert({ date, is_leave: isLeave }, { onConflict: 'date' })
@@ -180,6 +203,7 @@ export default function DailyEntryMobile() {
         }
       }
 
+      setHasSavedLog(true);
       haptic.heavy();
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
@@ -187,6 +211,42 @@ export default function DailyEntryMobile() {
     } catch (err: any) {
       console.error('Full Save Error:', err);
       setError(err.message || 'System logic failure during commit');
+      haptic.medium();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteWholeDayLog = async () => {
+    haptic.heavy();
+    const confirmDelete = window.confirm("Are you sure you want to completely delete today's work log? This action cannot be undone.");
+    if (!confirmDelete) return;
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      const { error: delErr } = await supabase
+        .from('daily_entries')
+        .delete()
+        .eq('date', date);
+
+      if (delErr) {
+        console.error('Delete Log Error:', delErr);
+        throw new Error(`Delete failure: ${delErr.message}`);
+      }
+
+      setItems([]);
+      setIsLeave(false);
+      setHasSavedLog(false);
+      
+      haptic.heavy();
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 2000);
+      loadDailyData();
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Failed to delete the log');
       haptic.medium();
     } finally {
       setSaving(false);
@@ -240,16 +300,7 @@ export default function DailyEntryMobile() {
             <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em] ml-1">Daily Work Ledger</p>
           </motion.div>
           
-          {!isLeave && (
-            <motion.div 
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="text-right"
-            >
-              <p className="text-[10px] text-white/30 font-black uppercase tracking-widest mb-1">Day Value</p>
-              <h2 className="text-4xl font-black text-emerald-400 tabular-nums leading-none">₹{dailyTotal.toFixed(0)}</h2>
-            </motion.div>
-          )}
+          {/* Day Value calculation removed as requested */}
         </header>
 
         <div className="space-y-4 mb-10">
@@ -328,7 +379,6 @@ export default function DailyEntryMobile() {
               <div className="space-y-6">
                 {items.map((item, index) => {
                   const wt = workTypes.find(w => w.id === item.work_type_id);
-                  const price = calculateItemPrice(item);
                   return (
                     <motion.div
                       key={index}
@@ -336,56 +386,74 @@ export default function DailyEntryMobile() {
                       initial={{ opacity: 0, scale: 0.9, y: 20 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                      className="card-heavy p-5 md:p-8 flex items-center gap-4 md:gap-10 group relative overflow-hidden"
+                      className="card-heavy p-5 md:p-8 flex items-center justify-between gap-4 md:gap-10 group relative overflow-hidden"
                       style={{ borderLeftColor: wt?.color || '#3b82f6', borderLeftWidth: '8px' }}
                     >
-                      <div className="w-16 h-16 md:w-24 md:h-24 rounded-[20px] md:rounded-[36px] bg-white/5 flex items-center justify-center text-4xl md:text-6xl shadow-inner border border-white/10">
-                        {wt?.icon}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-black text-xl md:text-3xl truncate tracking-tighter mb-1 md:mb-3 leading-none">{wt?.display_name}</h4>
-                        <div className="flex flex-wrap gap-1.5 md:gap-2.5">
-                          {item.operation_ids.map(id => (
-                            <span key={id} className="bg-white/10 text-[8px] md:text-[10px] font-black px-2 md:px-4 py-1 md:py-2 rounded-lg md:rounded-xl border border-white/5 uppercase text-white/40 tracking-widest">
-                              {operations.find(o => o.id === id)?.display_name}
-                            </span>
-                          ))}
+                      <div className="flex items-center gap-4 md:gap-8 flex-1 min-w-0">
+                        <div className="w-16 h-16 md:w-24 md:h-24 rounded-[20px] md:rounded-[36px] bg-white/5 flex items-center justify-center text-4xl md:text-6xl shadow-inner border border-white/10 flex-shrink-0">
+                          {wt?.icon}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-black text-xl md:text-3xl truncate tracking-tighter mb-1 md:mb-3 leading-none">{wt?.display_name}</h4>
+                          <div className="flex flex-wrap gap-1.5 md:gap-2.5">
+                            {item.operation_ids.map(id => (
+                              <span key={id} className="bg-white/10 text-[8px] md:text-[10px] font-black px-2 md:px-4 py-1 md:py-2 rounded-lg md:rounded-xl border border-white/5 uppercase text-white/40 tracking-widest">
+                                {operations.find(o => o.id === id)?.display_name}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       </div>
-                      <div className="text-right z-10">
+                      
+                      <div className="text-right z-10 flex items-center gap-4 md:gap-6 flex-shrink-0">
                         <div className="text-3xl md:text-6xl font-black text-blue-400 tabular-nums leading-none tracking-tighter">×{item.quantity}</div>
+                        <button 
+                          onClick={() => {
+                            setItems(items.filter((_, i) => i !== index));
+                            haptic.heavy();
+                          }}
+                          className="w-12 h-12 rounded-2xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 flex items-center justify-center text-red-500 active:scale-90 transition-all"
+                          title="Delete Item"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
                       </div>
-                      <button 
-                        onClick={() => {
-                          setItems(items.filter((_, i) => i !== index));
-                          haptic.heavy();
-                        }}
-                        className="absolute -top-1 -right-1 w-14 h-14 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:scale-110 active:scale-90 shadow-2xl z-20"
-                      >
-                        <Trash2 className="w-7 h-7" />
-                      </button>
                     </motion.div>
                   );
                 })}
                 
-                <div className="grid grid-cols-2 gap-6 pt-16">
-                  <button 
-                    onClick={copyWhatsApp} 
-                    className="h-28 rounded-[44px] glass-heavy border-2 border-emerald-500/30 flex flex-col items-center justify-center gap-2 group active:scale-95 transition-all hover:bg-emerald-500/5"
-                  >
-                    <MessageCircle className="w-10 h-10 text-emerald-500 group-hover:scale-110 transition-transform duration-500" />
-                    <span className="text-[11px] font-black text-emerald-500 uppercase tracking-[0.2em]">Share Report</span>
-                  </button>
+                <div className="space-y-4 pt-16">
+                  <div className="grid grid-cols-2 gap-4">
+                    <button 
+                      onClick={copyWhatsApp} 
+                      className="h-20 rounded-[32px] glass-heavy border-2 border-emerald-500/30 flex flex-col items-center justify-center gap-1 group active:scale-95 transition-all hover:bg-emerald-500/5 text-emerald-500"
+                    >
+                      <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform duration-500" />
+                      <span className="text-[9px] font-black uppercase tracking-[0.2em]">Share Report</span>
+                    </button>
+                    
+                    <button 
+                      onClick={hasSavedLog ? deleteWholeDayLog : () => { setItems([]); haptic.heavy(); }}
+                      disabled={saving}
+                      className="h-20 rounded-[32px] glass-heavy border-2 border-red-500/30 flex flex-col items-center justify-center gap-1 group active:scale-95 transition-all hover:bg-red-500/5 text-red-500 disabled:opacity-50"
+                    >
+                      <Trash2 className="w-6 h-6 group-hover:scale-110 transition-transform duration-500" />
+                      <span className="text-[9px] font-black uppercase tracking-[0.2em]">
+                        {hasSavedLog ? 'Delete Log' : 'Clear Draft'}
+                      </span>
+                    </button>
+                  </div>
+
                   <button 
                     onClick={saveDay} 
                     disabled={saving}
-                    className="btn-apple-primary h-28 !rounded-[44px] flex flex-col items-center justify-center gap-2 shadow-[0_30px_80px_rgba(10,132,255,0.4)] disabled:opacity-50 relative overflow-hidden"
+                    className="btn-apple-primary w-full h-24 !rounded-[32px] flex flex-col items-center justify-center gap-1 shadow-[0_30px_80px_rgba(10,132,255,0.4)] disabled:opacity-50 relative overflow-hidden"
                   >
                     {saving ? (
                       <RefreshCw className="w-8 h-8 animate-spin" />
                     ) : (
                       <>
-                        <Check className="w-10 h-10" strokeWidth={5} />
+                        <Check className="w-8 h-8" strokeWidth={5} />
                         <span className="text-[11px] font-black uppercase tracking-[0.2em]">COMMIT TO LOG</span>
                       </>
                     )}
@@ -404,13 +472,24 @@ export default function DailyEntryMobile() {
               <Coffee className="w-32 h-32 text-orange-500/20 mx-auto mb-12 animate-pulse" />
               <h3 className="text-5xl font-black mb-4 text-orange-500/40 tracking-tighter uppercase">Rest sequence</h3>
               <p className="text-orange-500/20 font-black uppercase tracking-[0.4em] text-xs">Recharging neural capacity</p>
-              <button 
-                onClick={saveDay} 
-                disabled={saving}
-                className="mt-20 text-[11px] font-black text-white/30 underline decoration-white/20 underline-offset-[16px] uppercase tracking-[0.5em] hover:text-white transition-all"
-              >
-                {saving ? 'SYNCHRONIZING...' : 'CONFIRM REST STATUS'}
-              </button>
+              <div className="mt-20 flex flex-col items-center gap-6">
+                <button 
+                  onClick={saveDay} 
+                  disabled={saving}
+                  className="text-[11px] font-black text-white/30 underline decoration-white/20 underline-offset-[16px] uppercase tracking-[0.5em] hover:text-white transition-all"
+                >
+                  {saving ? 'SYNCHRONIZING...' : 'CONFIRM REST STATUS'}
+                </button>
+                {hasSavedLog && (
+                  <button 
+                    onClick={deleteWholeDayLog} 
+                    disabled={saving}
+                    className="text-[10px] font-black text-red-500/60 hover:text-red-500 transition-all uppercase tracking-[0.4em]"
+                  >
+                    DELETE REST SEQUENCE LOG
+                  </button>
+                )}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

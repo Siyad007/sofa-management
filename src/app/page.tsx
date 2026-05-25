@@ -22,8 +22,7 @@ import PageTransition from '@/components/PageTransition';
 
 interface DashboardStats {
   todayWork: number;
-  weekSalary: number;
-  weekExpenses: number;
+  weekItems: number;
   isLeaveToday: boolean;
 }
 
@@ -36,8 +35,7 @@ interface TodayWorkItem {
 export default function Home() {
   const [stats, setStats] = useState<DashboardStats>({
     todayWork: 0,
-    weekSalary: 0,
-    weekExpenses: 0,
+    weekItems: 0,
     isLeaveToday: false
   });
   const [todayItems, setTodayItems] = useState<TodayWorkItem[]>([]);
@@ -78,29 +76,23 @@ export default function Home() {
         setStats(prev => ({ ...prev, todayWork: items.reduce((s: number, i: any) => s + i.quantity, 0), isLeaveToday: todayEntry.is_leave }));
       }
 
-      // 2. Weekly Salary
+      // 2. Weekly Production Yield
       const { data: entries } = await supabase
         .from('daily_entries')
-        .select('*, daily_entry_items(*, item_operations(*))')
+        .select('*, daily_entry_items(*)')
         .gte('date', startStr)
         .lte('date', endStr);
 
-      const { data: pricing } = await supabase.from('pricing').select('*');
-
-      let weekTotal = 0;
-      if (entries && pricing) {
+      let weekTotalItems = 0;
+      if (entries) {
         entries.forEach(entry => {
           (entry.daily_entry_items || []).forEach((item: any) => {
-            const itemOpTotal = (item.item_operations || []).reduce((sum: number, io: any) => {
-              const p = pricing.find(pr => pr.work_type_id === item.work_type_id && pr.operation_id === io.operation_id);
-              return sum + (p ? parseFloat(p.price) : 0);
-            }, 0);
-            weekTotal += itemOpTotal * item.quantity;
+            weekTotalItems += item.quantity;
           });
         });
       }
 
-      setStats(prev => ({ ...prev, weekSalary: weekTotal }));
+      setStats(prev => ({ ...prev, weekItems: weekTotalItems }));
     } catch (error) {
       console.error('Dashboard Error:', error);
     } finally {
@@ -176,26 +168,25 @@ export default function Home() {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
-          {/* Weekly Salary Bento - Full Width on Mobile */}
+          {/* Weekly Production Bento - Full Width on Mobile */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             whileHover={{ scale: 1.01 }}
-            className="md:col-span-2 card-heavy p-8 md:p-14 relative overflow-hidden group border-l-[12px] md:border-l-[20px] border-emerald-500 shadow-[0_30px_100px_rgba(0,0,0,0.4)] transition-all duration-500"
+            className="md:col-span-2 card-heavy p-8 md:p-14 relative overflow-hidden group border-l-[12px] md:border-l-[20px] border-blue-500 shadow-[0_30px_100px_rgba(0,0,0,0.4)] transition-all duration-500"
           >
-            <div className="absolute top-0 right-0 w-full h-full bg-emerald-500/5 blur-[140px] rounded-full -mr-32 -mt-32 group-hover:bg-emerald-500/10 transition-all duration-700" />
+            <div className="absolute top-0 right-0 w-full h-full bg-blue-500/5 blur-[140px] rounded-full -mr-32 -mt-32 group-hover:bg-blue-500/10 transition-all duration-700" />
             
             <div className="relative z-10">
               <div className="flex items-center gap-3 mb-6 md:mb-8">
-                <div className="w-1.5 h-8 md:h-10 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
-                <p className="text-[10px] md:text-xs font-black text-white/30 uppercase tracking-[0.3em]">Fiscal Cycle Revenue</p>
+                <div className="w-1.5 h-8 md:h-10 bg-blue-500 rounded-full animate-pulse shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
+                <p className="text-[10px] md:text-xs font-black text-white/30 uppercase tracking-[0.3em]">Weekly Production Yield</p>
               </div>
               
               <div className="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-6">
-                <h2 className="text-6xl md:text-[120px] font-black tracking-tighter text-emerald-400 drop-shadow-[0_0_50px_rgba(52,211,153,0.4)] leading-none">₹{stats.weekSalary.toFixed(0)}</h2>
-                <div className="hidden md:block p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 group-hover:scale-110 transition-transform">
-                  <TrendingUpIcon className="w-8 h-8 text-emerald-500" />
-                </div>
+                <h2 className="text-6xl md:text-[100px] font-black tracking-tighter text-blue-400 drop-shadow-[0_0_50px_rgba(59,130,246,0.4)] leading-none">
+                  {stats.weekItems} <span className="text-2xl md:text-4xl font-bold text-white/40 tracking-normal uppercase">sofas</span>
+                </h2>
               </div>
               
               <div className="mt-8 md:mt-16">

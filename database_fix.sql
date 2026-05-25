@@ -46,7 +46,7 @@ CREATE TABLE pricing (
 -- 4. Daily Entries
 CREATE TABLE daily_entries (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  date DATE NOT NULL DEFAULT CURRENT_DATE,
+  date DATE NOT NULL DEFAULT CURRENT_DATE UNIQUE,
   is_leave BOOLEAN DEFAULT FALSE,
   notes TEXT,
   created_at TIMESTAMP DEFAULT NOW()

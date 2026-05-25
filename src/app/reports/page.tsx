@@ -140,7 +140,6 @@ export default function ReportsPage() {
       startY: 50,
       head: [['Metric', 'Value']],
       body: [
-        ['Total Salary Earned', `INR ${report.totalSalary.toFixed(2)}`],
         ['Total Items Produced', report.totalItems.toString()],
         ['Audit Status', 'Verified'],
       ],
@@ -151,13 +150,12 @@ export default function ReportsPage() {
     // Daily Breakdown
     const tableBody = report.daySummaries.map(day => [
       new Date(day.date).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }),
-      day.isLeave ? 'LEAVE' : day.items.join('\n'),
-      day.isLeave ? '-' : `INR ${day.total.toFixed(2)}`
+      day.isLeave ? 'LEAVE' : day.items.join('\n')
     ]);
 
     autoTable(doc, {
       startY: (doc as any).lastAutoTable.finalY + 15,
-      head: [['Date', 'Work Done', 'Daily Total']],
+      head: [['Date', 'Work Done']],
       body: tableBody,
       theme: 'striped',
       headStyles: { fillColor: [10, 132, 255] }
@@ -229,10 +227,10 @@ export default function ReportsPage() {
         <header className="mb-14 pt-10 flex items-end justify-between">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
             <div className="flex items-center gap-2 mb-3 text-purple-500 font-black uppercase tracking-[0.4em] text-[10px]">
-              <Sparkles className="w-4 h-4 fill-purple-500" /> Financial Intelligence
+              <Sparkles className="w-4 h-4 fill-purple-500" /> Production Intelligence
             </div>
-            <h1 className="text-5xl font-black tracking-tighter leading-none mb-1">Audit Hub</h1>
-            <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em] ml-1">Salary Reconciliation</p>
+            <h1 className="text-5xl font-black tracking-tighter leading-none mb-1">Summary Hub</h1>
+            <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em] ml-1">Weekly Work Summary</p>
           </motion.div>
           
           <motion.div
@@ -270,21 +268,21 @@ export default function ReportsPage() {
           ) : report ? (
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-12">
               {/* Summary Bento */}
-              <div className="card-heavy p-12 relative overflow-hidden group bg-gradient-to-br from-emerald-500/10 to-transparent border-emerald-500/30">
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -mr-48 -mt-48" />
+              <div className="card-heavy p-12 relative overflow-hidden group bg-gradient-to-br from-blue-500/10 to-transparent border-blue-500/30">
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full -mr-48 -mt-48" />
                 <div className="relative z-10">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-2 h-8 bg-emerald-500 rounded-full" />
-                    <div className="text-emerald-500 font-black uppercase tracking-[0.3em] text-[11px]">
-                      Revenue Breakdown
+                    <div className="w-2 h-8 bg-blue-500 rounded-full" />
+                    <div className="text-blue-500 font-black uppercase tracking-[0.3em] text-[11px]">
+                      Production Yield Breakdown
                     </div>
                   </div>
-                  <p className="text-xs font-black text-white/30 uppercase tracking-widest mb-2">Internal Salary Calculation</p>
+                  <p className="text-xs font-black text-white/30 uppercase tracking-widest mb-2">Weekly Unit Yield</p>
                   <div className="flex items-baseline gap-4">
-                    <h2 className="text-8xl font-black text-emerald-400 tracking-tighter drop-shadow-[0_0_40px_rgba(52,211,153,0.3)]">₹{report.totalSalary.toFixed(0)}</h2>
-                    <ArrowUpRight className="w-10 h-10 text-emerald-500/40" />
+                    <h2 className="text-8xl font-black text-blue-400 tracking-tighter drop-shadow-[0_0_40px_rgba(59,130,246,0.3)]">{report.totalItems}</h2>
+                    <span className="text-2xl font-bold text-white/40 uppercase tracking-wider">Sofas</span>
                   </div>
-                  <p className="mt-6 text-[10px] font-black text-emerald-500/60 uppercase tracking-[0.4em] leading-relaxed max-w-[200px]">Audited against master pricing table</p>
+                  <p className="mt-6 text-[10px] font-black text-blue-500/60 uppercase tracking-[0.4em] leading-relaxed max-w-[240px]">Aggregated production yield across all active prototypes</p>
                 </div>
               </div>
 
@@ -311,12 +309,7 @@ export default function ReportsPage() {
                           </p>
                           <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.2em]">{new Date(day.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' })}</p>
                         </div>
-                        {!day.isLeave && (
-                          <div className="text-right">
-                            <p className="text-[10px] text-white/30 font-black uppercase tracking-widest mb-2">Yield Value</p>
-                            <span className="font-black text-3xl text-emerald-400 tabular-nums tracking-tighter">₹{day.total.toFixed(0)}</span>
-                          </div>
-                        )}
+                        {/* Daily monetary yield display removed as requested */}
                       </div>
                       
                       {day.isLeave ? (
